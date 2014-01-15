@@ -1,7 +1,8 @@
 #ifndef _LINUX_STDDEF_H
 #define _LINUX_STDDEF_H
 
-#include <linux/compiler.h>
+#include <uapi/linux/stddef.h>
+
 
 #undef NULL
 #if defined(__cplusplus)
@@ -9,9 +10,7 @@
 #else
 #define NULL ((void *)0)
 #endif
-
 #ifdef __KERNEL__
-
 enum {
 	false	= 0,
 	true	= 1
@@ -24,5 +23,4 @@ enum {
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 #endif
 #endif /* __KERNEL__ */
-
 #endif
