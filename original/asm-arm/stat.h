@@ -83,5 +83,4 @@ struct stat64 {
 
 	unsigned long long	st_ino;
 };
-
 #endif

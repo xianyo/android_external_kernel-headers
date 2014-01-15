@@ -1,6 +1,23 @@
+/*
+ * Copyright © 2000-2010 David Woodhouse <dwmw2@infradead.org> et al.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
 
 /* Overhauled routines for dealing with different mmap regions of flash */
-/* $Id: map.h,v 1.54 2005/11/07 11:14:54 gleixner Exp $ */
 
 #ifndef __LINUX_MTD_MAP_H__
 #define __LINUX_MTD_MAP_H__
@@ -8,12 +25,12 @@
 #include <linux/types.h>
 #include <linux/list.h>
 #include <linux/string.h>
-
-#include <linux/mtd/compatmac.h>
+#include <linux/bug.h>
+#include <linux/kernel.h>
 
 #include <asm/unaligned.h>
-#include <asm/system.h>
 #include <asm/io.h>
+#include <asm/barrier.h>
 
 #ifdef CONFIG_MTD_MAP_BANK_WIDTH_1
 #define map_bankwidth(map) 1
@@ -125,7 +142,15 @@
 #endif
 
 #ifndef map_bankwidth
-#error "No bus width supported. What's the point?"
+#warning "No CONFIG_MTD_MAP_BANK_WIDTH_xx selected. No NOR chip support can work"
+static inline int map_bankwidth(void *map)
+{
+	BUG();
+	return 0;
+}
+#define map_bankwidth_is_large(map) (0)
+#define map_words(map) (0)
+#define MAX_MAP_BANKWIDTH 1
 #endif
 
 static inline int map_bankwidth_supported(int w)
@@ -181,14 +206,15 @@ typedef union {
 */
 
 struct map_info {
-	char *name;
+	const char *name;
 	unsigned long size;
-	unsigned long phys;
+	resource_size_t phys;
 #define NO_XIP (-1UL)
 
 	void __iomem *virt;
 	void *cached;
 
+	int swap; /* this mapping's byte-swapping requirement */
 	int bankwidth; /* in octets. This isn't necessarily the width
 		       of actual bus cycles -- it's the repeat interval
 		      in bytes, before you are talking to the first chip again.
@@ -216,8 +242,10 @@ struct map_info {
 	   must leave it enabled. */
 	void (*set_vpp)(struct map_info *, int);
 
+	unsigned long pfow_base;
 	unsigned long map_priv_1;
 	unsigned long map_priv_2;
+	struct device_node *device_node;
 	void *fldrv_priv;
 	struct mtd_chip_driver *fldrv;
 };
@@ -227,7 +255,9 @@ struct mtd_chip_driver {
 	void (*destroy)(struct mtd_info *);
 	struct module *module;
 	char *name;
+#ifdef __KERNEL__
 	struct list_head list;
+#endif
 };
 
 void register_mtd_chip_driver(struct mtd_chip_driver *);
@@ -315,6 +345,8 @@ static inline map_word map_word_load(struct map_info *map, const void *ptr)
 #endif
 	else if (map_bankwidth_is_large(map))
 		memcpy(r.x, ptr, map->bankwidth);
+	else
+		BUG();
 
 	return r;
 }
@@ -378,6 +410,8 @@ static inline map_word inline_map_read(struct map_info *map, unsigned long ofs)
 #endif
 	else if (map_bankwidth_is_large(map))
 		memcpy_fromio(r.x, map->virt+ofs, map->bankwidth);
+	else
+		BUG();
 
 	return r;
 }
@@ -396,6 +430,8 @@ static inline void inline_map_write(struct map_info *map, const map_word datum, 
 #endif
 	else if (map_bankwidth_is_large(map))
 		memcpy_toio(map->virt+ofs, datum.x, map->bankwidth);
+	else
+		BUG();
 	mb();
 }
 
@@ -404,7 +440,7 @@ static inline void inline_map_copy_from(struct map_info *map, void *to, unsigned
 	if (map->cached)
 		memcpy(to, (char *)map->cached + from, len);
 	else
-		memcpy_fromio(to, map->virt + from, len);
+		memcpy(to, map->virt + from, len);
 }
 
 static inline void inline_map_copy_to(struct map_info *map, unsigned long to, const void *from, ssize_t len)

@@ -4,17 +4,18 @@
 #ifndef _ARCH_ARM_HW_IRQ_H
 #define _ARCH_ARM_HW_IRQ_H
 
-#include <asm/mach/irq.h>
+static inline void ack_bad_irq(int irq)
+{
+	extern unsigned long irq_err_count;
+	irq_err_count++;
+}
 
-#if defined(CONFIG_NO_IDLE_HZ)
-# include <asm/dyntick.h>
-# define handle_dynamic_tick(action)					\
-	if (!(action->flags & IRQF_TIMER) && system_timer->dyn_tick) {	\
-		write_seqlock(&xtime_lock);				\
-		if (system_timer->dyn_tick->state & DYN_TICK_ENABLED)	\
-			system_timer->dyn_tick->handler(irq, 0, regs);	\
-		write_sequnlock(&xtime_lock);				\
-	}
-#endif
+void set_irq_flags(unsigned int irq, unsigned int flags);
+
+#define IRQF_VALID	(1 << 0)
+#define IRQF_PROBE	(1 << 1)
+#define IRQF_NOAUTOEN	(1 << 2)
+
+#define ARCH_IRQ_INIT_FLAGS	(IRQ_NOREQUEST | IRQ_NOPROBE)
 
 #endif

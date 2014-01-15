@@ -1,5 +1,5 @@
 /*
- *  linux/include/asm-arm/timex.h
+ *  arch/arm/include/asm/timex.h
  *
  *  Copyright (C) 1997,1998 Russell King
  *
@@ -12,13 +12,13 @@
 #ifndef _ASMARM_TIMEX_H
 #define _ASMARM_TIMEX_H
 
-#include <asm/arch/timex.h>
+#ifdef CONFIG_ARCH_MULTIPLATFORM
+#define CLOCK_TICK_RATE 1000000
+#else
+#include <asm/mach/timex.h>
+#endif
 
 typedef unsigned long cycles_t;
-
-static inline cycles_t get_cycles (void)
-{
-	return 0;
-}
+#define get_cycles()	({ cycles_t c; read_current_timer(&c) ? 0 : c; })
 
 #endif

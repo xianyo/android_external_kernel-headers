@@ -15,7 +15,9 @@
 
 typedef struct
 {
+#ifdef __KERNEL__
 	struct list_head    link;
+#endif
 	int                 lock_count;
 	int                 flags;
 	const char         *name;
@@ -35,7 +37,9 @@ typedef struct
 typedef struct android_early_suspend android_early_suspend_t;
 struct android_early_suspend
 {
+#ifdef __KERNEL__
 	struct list_head link;
+#endif
 	int level;
 	void (*suspend)(android_early_suspend_t *h);
 	void (*resume)(android_early_suspend_t *h);

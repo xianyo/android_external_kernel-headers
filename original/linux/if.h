@@ -25,8 +25,9 @@
 
 #define	IFNAMSIZ	16
 #define	IFALIASZ	256
+#ifdef __KERNEL__
 #include <linux/hdlc/ioctl.h>
-
+#endif
 /* Standard interface flags (netdevice->flags). */
 #define	IFF_UP		0x1		/* interface is up		*/
 #define	IFF_BROADCAST	0x2		/* broadcast address valid	*/
@@ -71,8 +72,19 @@
 					 * release skb->dst
 					 */
 #define IFF_DONT_BRIDGE 0x800		/* disallow bridging this ether dev */
-#define IFF_IN_NETPOLL	0x1000		/* whether we are processing netpoll */
-#define IFF_DISABLE_NETPOLL	0x2000	/* disable netpoll at run-time */
+#define IFF_DISABLE_NETPOLL	0x1000	/* disable netpoll at run-time */
+#define IFF_MACVLAN_PORT	0x2000	/* device used as macvlan port */
+#define IFF_BRIDGE_PORT	0x4000		/* device used as bridge port */
+#define IFF_OVS_DATAPATH	0x8000	/* device used as Open vSwitch
+					 * datapath port */
+#define IFF_TX_SKB_SHARING	0x10000	/* The interface supports sharing
+					 * skbs on transmit */
+#define IFF_UNICAST_FLT	0x20000		/* Supports unicast filtering	*/
+#define IFF_TEAM_PORT	0x40000		/* device used as team port */
+#define IFF_SUPP_NOFCS	0x80000		/* device supports sending custom FCS */
+#define IFF_LIVE_ADDR_CHANGE 0x100000	/* device supports hardware address
+					 * change when it's running */
+
 
 #define IF_GET_IFACE	0x0001		/* for querying only */
 #define IF_GET_PROTO	0x0002
@@ -141,6 +153,7 @@ struct ifmap {
 struct if_settings {
 	unsigned int type;	/* Type of physical device or protocol */
 	unsigned int size;	/* Size of the data allocated by the caller */
+#ifdef __KERNEL__	
 	union {
 		/* {atm/eth/dsl}_settings anyone ? */
 		raw_hdlc_proto		__user *raw_hdlc;
@@ -153,6 +166,7 @@ struct if_settings {
 		sync_serial_settings	__user *sync;
 		te1_settings		__user *te1;
 	} ifs_ifsu;
+#endif
 };
 
 /*
