@@ -75,6 +75,7 @@ struct watchdog_ops {
  * The lock field is for watchdog core internal use only and should not be
  * touched.
  */
+#ifdef __KERNEL__
 struct watchdog_device {
 	int id;
 	struct cdev cdev;
@@ -96,6 +97,7 @@ struct watchdog_device {
 #define WDOG_NO_WAY_OUT		3	/* Is 'nowayout' feature set ? */
 #define WDOG_UNREGISTERED	4	/* Has the device been unregistered */
 };
+#endif
 
 #ifdef CONFIG_WATCHDOG_NOWAYOUT
 #define WATCHDOG_NOWAYOUT		1

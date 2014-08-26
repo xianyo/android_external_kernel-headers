@@ -19,6 +19,7 @@
 #include <linux/time.h>
 #include <linux/uidgid.h>
 
+#ifdef __KERNEL__
 struct kstat {
 	u64		ino;
 	dev_t		dev;
@@ -34,5 +35,6 @@ struct kstat {
 	unsigned long	blksize;
 	unsigned long long	blocks;
 };
+#endif
 
 #endif

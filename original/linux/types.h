@@ -11,10 +11,13 @@
 
 typedef __u32 __kernel_dev_t;
 
+#ifdef __KERNEL__
 typedef __kernel_fd_set		fd_set;
 typedef __kernel_dev_t		dev_t;
 typedef __kernel_ino_t		ino_t;
 typedef __kernel_mode_t		mode_t;
+#endif
+
 typedef unsigned short		umode_t;
 #ifdef __KERNEL__
 typedef __u32			nlink_t;
@@ -24,7 +27,9 @@ typedef __kernel_pid_t		pid_t;
 typedef __kernel_daddr_t	daddr_t;
 typedef __kernel_key_t		key_t;
 typedef __kernel_suseconds_t	suseconds_t;
+#ifdef __KERNEL__
 typedef __kernel_timer_t	timer_t;
+#endif
 typedef __kernel_clockid_t	clockid_t;
 typedef __kernel_mqd_t		mqd_t;
 #ifdef __KERNEL__
@@ -147,11 +152,13 @@ typedef unsigned long blkcnt_t;
 #define pgoff_t unsigned long
 #endif
 
+#ifdef __KERNEL__
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
 typedef u64 dma_addr_t;
 #else
 typedef u32 dma_addr_t;
 #endif /* dma_addr_t */
+#endif
 
 #ifdef __CHECKER__
 #else
@@ -163,6 +170,7 @@ typedef unsigned __bitwise__ gfp_t;
 typedef unsigned __bitwise__ fmode_t;
 typedef unsigned __bitwise__ oom_flags_t;
 
+#ifdef __KERNEL__
 #ifdef CONFIG_PHYS_ADDR_T_64BIT
 typedef u64 phys_addr_t;
 #else
@@ -170,6 +178,7 @@ typedef u32 phys_addr_t;
 #endif
 
 typedef phys_addr_t resource_size_t;
+#endif
 
 /*
  * This type is the placeholder for a hardware interrupt number. It has to be

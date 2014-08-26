@@ -11,6 +11,7 @@
 #ifndef __ASSEMBLY__
 #include <linux/compiler.h>
 #include <linux/types.h>
+#ifdef __KERNEL__
 /*
  * Resources are tree-like, allowing
  * nesting etc..
@@ -22,7 +23,7 @@ struct resource {
 	unsigned long flags;
 	struct resource *parent, *sibling, *child;
 };
-
+#endif
 /*
  * IO resources have these defined flags.
  */
@@ -157,7 +158,9 @@ extern int allocate_resource(struct resource *root, struct resource *new,
 						       resource_size_t,
 						       resource_size_t),
 			     void *alignf_data);
+#ifdef __KERNEL__
 struct resource *lookup_resource(struct resource *root, resource_size_t start);
+#endif
 int adjust_resource(struct resource *res, resource_size_t start,
 		    resource_size_t size);
 resource_size_t resource_alignment(struct resource *res);

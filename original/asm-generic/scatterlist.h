@@ -2,7 +2,7 @@
 #define __ASM_GENERIC_SCATTERLIST_H
 
 #include <linux/types.h>
-
+#ifdef __KERNEL__
 struct scatterlist {
 #ifdef CONFIG_DEBUG_SG
 	unsigned long	sg_magic;
@@ -15,7 +15,7 @@ struct scatterlist {
 	unsigned int	dma_length;
 #endif
 };
-
+#endif
 /*
  * These macros should be used after a dma_map_sg call has been done
  * to get bus addresses of each of the SG entries and their lengths.

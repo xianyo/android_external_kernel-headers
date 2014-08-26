@@ -148,21 +148,20 @@ struct data_chunk {
  * @frame_size: Number of chunks in a frame i.e, size of sgl[].
  * @sgl: Array of {chunk,icg} pairs that make up a frame.
  */
+#ifdef __KERNEL__
 struct dma_interleaved_template {
 	dma_addr_t src_start;
 	dma_addr_t dst_start;
 	enum dma_transfer_direction dir;
-#ifdef __KERNEL__
 	bool src_inc;
 	bool dst_inc;
 	bool src_sgl;
 	bool dst_sgl;
-#endif
 	size_t numf;
 	size_t frame_size;
 	struct data_chunk sgl[0];
 };
-
+#endif
 /**
  * enum dma_ctrl_flags - DMA flags to augment operation preparation,
  *  control completion, and communicate status.

@@ -18,6 +18,7 @@
 #include <linux/compiler.h>
 #include <linux/cpumask.h>
 
+#ifdef __KERNEL__
 struct device;
 
 struct cpu {
@@ -48,6 +49,7 @@ extern int arch_cpu_uevent(struct device *dev, struct kobj_uevent_env *env);
 extern ssize_t arch_print_cpu_modalias(struct device *dev,
 				       struct device_attribute *attr,
 				       char *bufptr);
+#endif
 #endif
 
 /*

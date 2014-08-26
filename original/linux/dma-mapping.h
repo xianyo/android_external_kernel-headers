@@ -8,6 +8,7 @@
 #include <linux/dma-direction.h>
 #include <linux/scatterlist.h>
 
+#ifdef __KERNEL__
 struct dma_map_ops {
 	void* (*alloc)(struct device *dev, size_t size,
 				dma_addr_t *dma_handle, gfp_t gfp,
@@ -55,7 +56,7 @@ struct dma_map_ops {
 #endif
 	int is_phys;
 };
-
+#endif
 #define DMA_BIT_MASK(n)	(((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
 
 #define DMA_MASK_NONE	0x0ULL

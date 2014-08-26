@@ -17,7 +17,7 @@
 #include <linux/device.h>
 #include <linux/cpumask.h>
 #include <linux/workqueue.h>
-
+#ifdef __KERNEL__
 struct node {
 	struct device	dev;
 
@@ -25,10 +25,14 @@ struct node {
 	struct work_struct	node_work;
 #endif
 };
+#endif
 
 struct memory_block;
 extern struct node *node_devices[];
+
+#ifdef __KERNEL__
 typedef  void (*node_registration_func_t)(struct node *);
+#endif
 
 extern void unregister_node(struct node *node);
 #ifdef CONFIG_NUMA

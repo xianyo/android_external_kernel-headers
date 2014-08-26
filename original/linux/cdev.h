@@ -9,13 +9,12 @@ struct file_operations;
 struct inode;
 struct module;
 
+#ifdef __KERNEL__
 struct cdev {
 	struct kobject kobj;
 	struct module *owner;
 	const struct file_operations *ops;
-#ifdef __KERNEL__
 	struct list_head list;
-#endif
 	dev_t dev;
 	unsigned int count;
 };
@@ -29,6 +28,7 @@ void cdev_put(struct cdev *p);
 int cdev_add(struct cdev *, dev_t, unsigned);
 
 void cdev_del(struct cdev *);
+#endif
 
 void cd_forget(struct inode *);
 
