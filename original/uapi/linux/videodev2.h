@@ -207,8 +207,8 @@ enum v4l2_priority {
 struct v4l2_rect {
 	__s32   left;
 	__s32   top;
-	__s32   width;
-	__s32   height;
+	__u32   width;
+	__u32   height;
 };
 
 struct v4l2_fract {
@@ -348,6 +348,8 @@ struct v4l2_pix_format {
 /* two non contiguous planes - one Y, one Cr + Cb interleaved  */
 #define V4L2_PIX_FMT_NV12M   v4l2_fourcc('N', 'M', '1', '2') /* 12  Y/CbCr 4:2:0  */
 #define V4L2_PIX_FMT_NV21M   v4l2_fourcc('N', 'M', '2', '1') /* 21  Y/CrCb 4:2:0  */
+#define V4L2_PIX_FMT_NV16M   v4l2_fourcc('N', 'M', '1', '6') /* 16  Y/CbCr 4:2:2  */
+#define V4L2_PIX_FMT_NV61M   v4l2_fourcc('N', 'M', '6', '1') /* 16  Y/CrCb 4:2:2  */
 #define V4L2_PIX_FMT_NV12MT  v4l2_fourcc('T', 'M', '1', '2') /* 12  Y/CbCr 4:2:0 64x32 macroblocks */
 #define V4L2_PIX_FMT_NV12MT_16X16 v4l2_fourcc('V', 'M', '1', '2') /* 12  Y/CbCr 4:2:0 16x16 macroblocks */
 
@@ -395,7 +397,7 @@ struct v4l2_pix_format {
 #define V4L2_PIX_FMT_H263     v4l2_fourcc('H', '2', '6', '3') /* H263          */
 #define V4L2_PIX_FMT_MPEG1    v4l2_fourcc('M', 'P', 'G', '1') /* MPEG-1 ES     */
 #define V4L2_PIX_FMT_MPEG2    v4l2_fourcc('M', 'P', 'G', '2') /* MPEG-2 ES     */
-#define V4L2_PIX_FMT_MPEG4    v4l2_fourcc('M', 'P', 'G', '4') /* MPEG-4 ES     */
+#define V4L2_PIX_FMT_MPEG4    v4l2_fourcc('M', 'P', 'G', '4') /* MPEG-4 part 2 ES */
 #define V4L2_PIX_FMT_XVID     v4l2_fourcc('X', 'V', 'I', 'D') /* Xvid           */
 #define V4L2_PIX_FMT_VC1_ANNEX_G v4l2_fourcc('V', 'C', '1', 'G') /* SMPTE 421M Annex G compliant stream */
 #define V4L2_PIX_FMT_VC1_ANNEX_L v4l2_fourcc('V', 'C', '1', 'L') /* SMPTE 421M Annex L compliant stream */
@@ -555,7 +557,7 @@ struct v4l2_jpegcompression {
 	__u32 jpeg_markers;     /* Which markers should go into the JPEG
 				 * output. Unless you exactly know what
 				 * you do, leave them untouched.
-				 * Inluding less markers will make the
+				 * Including less markers will make the
 				 * resulting code smaller, but there will
 				 * be fewer applications which can read it.
 				 * The presence of the APP and COM marker
@@ -567,7 +569,7 @@ struct v4l2_jpegcompression {
 #define V4L2_JPEG_MARKER_DRI (1<<5)    /* Define Restart Interval */
 #define V4L2_JPEG_MARKER_COM (1<<6)    /* Comment segment */
 #define V4L2_JPEG_MARKER_APP (1<<7)    /* App segment, driver will
-					* allways use APP0 */
+					* always use APP0 */
 };
 
 /*
@@ -900,7 +902,7 @@ typedef __u64 v4l2_std_id;
 /*
  * "Common" PAL - This macro is there to be compatible with the old
  * V4L1 concept of "PAL": /BGDKHI.
- * Several PAL standards are mising here: /M, /N and /Nc
+ * Several PAL standards are missing here: /M, /N and /Nc
  */
 #define V4L2_STD_PAL		(V4L2_STD_PAL_BG	|\
 				 V4L2_STD_PAL_DK	|\
@@ -1055,6 +1057,16 @@ struct v4l2_bt_timings {
    or used depends on the hardware. */
 #define V4L2_DV_FL_HALF_LINE			(1 << 3)
 
+/* A few useful defines to calculate the total blanking and frame sizes */
+#define V4L2_DV_BT_BLANKING_WIDTH(bt) \
+	((bt)->hfrontporch + (bt)->hsync + (bt)->hbackporch)
+#define V4L2_DV_BT_FRAME_WIDTH(bt) \
+	((bt)->width + V4L2_DV_BT_BLANKING_WIDTH(bt))
+#define V4L2_DV_BT_BLANKING_HEIGHT(bt) \
+	((bt)->vfrontporch + (bt)->vsync + (bt)->vbackporch + \
+	 (bt)->il_vfrontporch + (bt)->il_vsync + (bt)->il_vbackporch)
+#define V4L2_DV_BT_FRAME_HEIGHT(bt) \
+	((bt)->height + V4L2_DV_BT_BLANKING_HEIGHT(bt))
 
 /** struct v4l2_dv_timings - DV timings
  * @type:	the type of the timings
@@ -1790,7 +1802,7 @@ struct v4l2_event_subscription {
 #define V4L2_CHIP_MATCH_HOST V4L2_CHIP_MATCH_BRIDGE
 #define V4L2_CHIP_MATCH_I2C_DRIVER  1  /* Match against I2C driver name */
 #define V4L2_CHIP_MATCH_I2C_ADDR    2  /* Match against I2C 7-bit address */
-#define V4L2_CHIP_MATCH_AC97        3  /* Match against anciliary AC97 chip */
+#define V4L2_CHIP_MATCH_AC97        3  /* Match against ancillary AC97 chip */
 #define V4L2_CHIP_MATCH_SUBDEV      4  /* Match against subdev index */
 
 struct v4l2_dbg_match {
